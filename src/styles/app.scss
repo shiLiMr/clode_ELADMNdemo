@@ -1,0 +1,18 @@
+*{
+	margin: 0;
+	padding: 0;
+}
+
+.el-menu-item.is-active{
+	color: #36a3f7 !important;
+}
+
+.el-menu-item:hover{
+	background-color: #001528 !important;
+}
+.el-menu{
+	border-right: none !important;
+}
+.el-tabs__new-tab{
+	visibility: hidden;
+}

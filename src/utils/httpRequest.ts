@@ -60,7 +60,7 @@ class Request {
 			return config
 		}, (error: AxiosError) => {
 			// 请求报错
-			return Promise.reject(error)
+			 Promise.reject(error)
 		})
 
 		/**
@@ -70,14 +70,14 @@ class Request {
 			// 请求成功，直接返回当前数据
 			// 要在此进行404检验
 			const { data, config } = response // 结构
-			// if (data.code == TS.Code.UNAUTHORIZED) {
-			// 	// 清除token
-			// 	removeToken()
-			// 	// 清除本地存储的个人信息
-			// 	// 跳转到登录页面
-			// 	router.push('/login')
-			// 	return Promise.reject(data)
-			// }// 全局错误信息拦截 防止下载文件得时候返回数据流，没有code，直接报错
+			if (data.status == TS.Code.UNAUTHORIZED) { // 401
+				// 清除token
+				removeToken('token')
+				// 清除本地存储的个人信息
+				// 跳转到登录页面
+				router.push('/login')
+				return Promise.reject(data)
+			}// 全局错误信息拦截 防止下载文件得时候返回数据流，没有code，直接报错
 			return data
 		}, (error: AxiosError) => {
 			let title:string = ''
@@ -85,35 +85,30 @@ class Request {
 			const { response } = error
 			if(error&& response){
 				// 401,token失效
-				if(response.status == TS.Code.UNAUTHORIZED){
+				if(response.status === TS.Code.UNAUTHORIZED){
 					// 跳转到登录页面
-					router.push('/login')
+					window.location.href = '/login'
 				}
-				switch(
-					response.status // 跨域存在获取不到状态码情况
-				){
-					case TS.Code.PARAM_ERROR:
-						title = '请求参数错误'
-						break
-					case TS.Code.UNAUTHORIZED:
-						title = '资源未授权，请登录'
-						break
-					case TS.Code.NOT_FOUND:
-						title = '未找到请求资源'
-						break
-					case TS.Code.SERVER_ERROR:
-						title = '服务器错误'
-						break
+				// switch(
+				// 	response.status // 跨域存在获取不到状态码情况
+				// ){
+				// 	case TS.Code.PARAM_ERROR:
+				// 		title = '请求参数错误'
+				// 		break
+				// 	case TS.Code.UNAUTHORIZED:
+				// 		title = '资源未授权，请登录'
+				// 		break
+				// 	case TS.Code.NOT_FOUND:
+				// 		title = '未找到请求资源'
+				// 		break
+				// 	case TS.Code.SERVER_ERROR:
+				// 		title = '服务器错误'
+				// 		break
 
-					default:
-						title = response.status.toString()
-				}
-				return ElMessageBox.alert(
-					title,'提示',{
-						confirmButtonText:'确定',
-						type:'warning'
-					}
-				)
+				// 	default:
+				// 		title = response.status.toString()
+				// }
+				return response.data
 			}else{
 				// 跨域或取不到状态码或 其他状态进行处理
 				return ElMessageBox.alert(

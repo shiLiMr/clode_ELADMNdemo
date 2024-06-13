@@ -61,7 +61,7 @@ const codeimg = ref('')
 const getCode = () => { // 获取验证码
 	ruleForm.value.uuid = ''
 	getCodeApi().then((res: any) => {
-		console.log(res);
+		// console.log(res);
 		codeimg.value = res.img
 		ruleForm.value.uuid = res.uuid
 	})
@@ -99,8 +99,8 @@ const submitForm = () => {
 			uuid: ruleForm.value.uuid
 		}
 		if (user.password === getToken('Copypassword')) {
-			  user.password = encrypt(user.password) as  string
-				console.log(user.password);
+			user.password = encrypt(user.password) as string
+			console.log(user.password);
 		}
 
 		// if (ruleForm.value.rememberMe) {
@@ -110,12 +110,20 @@ const submitForm = () => {
 		// }
 
 		console.log(user);
-		loginApi(user).then(res => {
+		loginApi(user).then((res: any) => {
 			console.log(res);
-			setToken('Authorization',res.token) // 存储token
-			router.replace({path:'/'})
-			ElMessage.success('登录成功')
-		}).catch(err=>{
+			if (res.token) {
+				console.log(33333);
+
+				setToken('token', res.token) // 存储token
+				ElMessage.success('登录成功')
+				router.replace({ path: '/' })
+			} else {
+				ElMessage.error(res.message)
+				getCode()
+				return
+			}
+		}).catch(err => {
 			ElMessage.error(err.message)
 		})
 	})
